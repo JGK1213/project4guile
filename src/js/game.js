@@ -1,4 +1,3 @@
-
 var game = new Phaser.Game(800, 800, Phaser.CANVAS, 'project4-game', { preload: preload, create: create, update: update, render: render });
 
 function preload() {
@@ -6,14 +5,13 @@ function preload() {
     game.load.image('space', 'http://fc03.deviantart.net/fs71/f/2013/269/0/7/peach_tea_animated_cb_6colo_by_missdudette-d6o2o85.gif');
     game.load.image('bullet', 'http://img2.wikia.nocookie.net/__cb20121009064131/pockiepirate/images/9/99/Basic_Energy_Ball.png');
     game.load.image('ship', 'http://www.pixeljoint.com/files/icons/ship2_transparent_shading2.png');
-    game.load.image('invader', 'http://www.heruraha.net/download/file.php?avatar=22688_1343737809.png');
+    game.load.image('obstacle', 'http://www.heruraha.net/download/file.php?avatar=22688_1343737809.png');
     game.load.spritesheet('kaboom', 'http://fc02.deviantart.net/fs71/f/2013/010/9/f/explosion_spritesheet_for_games_by_gintasdx-d5r28q5.png', 128, 128);
-     game.load.audio('guile', ['assets/audio/guilestheme.mp3']);
+    // game.load.audio('guile', ['assets/audio/deadmau5soma.mp3']);
+    // game.load.audio('guile', ['assets/audio/guilestheme2.ogg', 'assets/audio/guilestheme2.mp3']);
+    game.load.audio('guile', ['assets/audio/bodenstaen.mp3']);
 
 }
-
-  
-
 
 var space;
 var player;
@@ -25,6 +23,9 @@ var explosions;
 var score = 0;
 var scoreString = '';
 var scoreText;
+var level = 1;
+var levelString = '';
+var levelText;
 
 var bullet;
 var bullets;
@@ -47,8 +48,9 @@ function create() {
 
     // Add music! 
     music = game.add.audio('guile');
-
+    music.loop= true;
     music.play();
+
 
     //  We need arcade physics
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -60,6 +62,7 @@ function create() {
     bullets = game.add.group();
     bullets.enableBody = true;
     bullets.physicsBodyType = Phaser.Physics.ARCADE;
+    bullets.setAll('outOfBoundsKill', true);
 
     //  All 40 of them
     bullets.createMultiple(40, 'bullet');
@@ -81,6 +84,11 @@ function create() {
     scoreString = 'Score : ';
     scoreText = game.add.text(10, 10, scoreString + score, { font: '34px Arial', fill: '#fff' });
 
+    //   The Level
+    levelString = 'Level : ';
+    levelText = game.add.text(10, 40, levelString + level, { font: '34px Arial', fill: '#fff' });
+
+
     // player.body.set('body.collideWorldBounds', true);
 
     //  and its physics settings
@@ -91,8 +99,9 @@ function create() {
 
     //  An explosion pool
     explosions = game.add.group();
-    explosions.createMultiple(50, 'kaboom');
-    explosions.forEach(setupInvader, this);
+    explosions.createMultiple(5, 'kaboom');
+    explosions.forEach(setupObstacle, this);
+    explosions.forEach(setupPlayer, this);
 
 
     //  Game input
@@ -104,36 +113,47 @@ function create() {
     }
 
 function createObstacles () {
-
-    for (var y = 0; y < 4; y++)
-    {
-        for (var x = 0; x < 10; x++)
-        {
-            var obstacle = obstacles.create(x * 48, y * 50, 'invader');
-            obstacle.anchor.setTo(0.5, 0.5);
-            obstacle.animations.add('fly', [ 0, 1, 2, 3 ], 20, true);
-            obstacle.play('fly');
-            obstacle.body.moves = false;
-        }
-    }
-
-    obstacles.x = 100;
-    obstacles.y = 50;
-
-    //  All this does is basically start the invaders moving. Notice we're moving the Group they belong to, rather than the invaders directly.
-    var tween = game.add.tween(obstacles).to( { x: 200 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
-
-    //  When the tween loops it calls descend
-    tween.onLoop.add(descend, this);
+var i = 0;
+var speed = 800  // initial speed
+var time = 200   // initial time in milleseconds to spawn obstacles
+  function difficulty() {
+    setTimeout(function () {
+      var obstacle = obstacles.create((Math.floor(Math.random() * 800) + 1),-100,'obstacle');
+      obstacle.anchor.setTo(0.5, 0.5);
+      obstacle.body.velocity.y= speed;
+      i++;
+      if( i % 50 == 0) {
+        if (speed < 6000){
+          speed += 100;      //increase speed of obstacles every 40 obstacles.
+          level += 1;
+          levelText.text = levelString + level;
+        };
+        if (time > 10) {
+          time -= 10;
+        };
+        difficulty();
+      }
+      else {
+        difficulty();
+      }
+    }, time)
+  }
+difficulty();
 }
 
-function setupInvader (invader) {
-
-    invader.anchor.x = 0.5;
-    invader.anchor.y = 0.5;
-    invader.animations.add('kaboom');
+function setupObstacle (obstacle) {
+    obstacle.anchor.x = 0.4;
+    obstacle.anchor.y = 0.3;
+    obstacle.animations.add('kaboom');
+}
+function setupPlayer (player) {
+    player.anchor.x = 0.4;
+    player.anchor.y = 0.3;
+    player.animations.add('kaboom');
 
 }
+
+
 
 function descend() {
 
@@ -142,32 +162,32 @@ function descend() {
 }
 
 function update() {
-        player.body.velocity.setTo(0, 0);
+  if (player.alive) {
+    player.body.velocity.setTo(0, 0);
 
-        if (cursors.left.isDown)
-        {
-            player.body.velocity.x = -400;
-        }
-        else if (cursors.right.isDown)
-        {
-            player.body.velocity.x = 400;
-        }
-        player.body.collideWorldBounds = true;
+    if (cursors.left.isDown) {
+      player.body.velocity.x = -400;
+    }
+    else if (cursors.right.isDown) {
+      player.body.velocity.x = 400;
+    }
+      player.body.collideWorldBounds = true;
 
     if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
     {
         fireBullet();
     }
-
+}
     // screenWrap(player);
 
-    bullets.forEachExists(screenWrap, this);
+    // bullets.forEachExists(screenWrap, this);
     // game.physics.arcade.collide(player, particles);
     // game.physics.arcade.collide(particles);
     game.physics.arcade.collide(player);
 
     //  Run collision
     game.physics.arcade.overlap(bullets, obstacles, collisionHandler, null, this);
+    game.physics.arcade.overlap(obstacles, player, collisionHandler, null, this);
     // game.physics.arcade.overlap(enemyBullets, player, enemyHitsPlayer, null, this);
 
 }
@@ -202,6 +222,18 @@ function collisionHandler (bullet, obstacle) {
 
 }
 
+function obstacleHitsPlayer (player, obstacle) {
+    player.kill();
+    obstacle.kill();
+    
+
+    //  And create an explosion :)
+    var explosion = explosions.getFirstExists(false);
+    explosion.reset(player.body.x, player.body.y);
+    explosion.play('kaboom', 50, false, true);
+
+}
+
 function fireBullet () {
 
     if (game.time.now > bulletTime)
@@ -233,25 +265,10 @@ function createBlock(size, color) {
   return bmd;
 }
 
-function screenWrap (player) {
+function resetBullet (bullet) {
 
-    if (player.x < 0)
-    {
-        player.x = game.width;
-    }
-    else if (player.x > game.width)
-    {
-        player.x = 0;
-    }
-
-    if (player.y < 0)
-    {
-        player.y = game.height;
-    }
-    else if (player.y > game.height)
-    {
-        player.y = 0;
-    }
+    //  Called if the bullet goes out of the screen
+    bullet.kill();
 
 }
 
