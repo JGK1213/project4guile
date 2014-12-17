@@ -1,4 +1,3 @@
-
 var game = new Phaser.Game(800, 800, Phaser.CANVAS, 'project4-game', { preload: preload, create: create, update: update, render: render });
 
 function preload() {
@@ -6,31 +5,44 @@ function preload() {
     game.load.image('space', 'http://fc03.deviantart.net/fs71/f/2013/269/0/7/peach_tea_animated_cb_6colo_by_missdudette-d6o2o85.gif');
     game.load.image('bullet', 'http://img2.wikia.nocookie.net/__cb20121009064131/pockiepirate/images/9/99/Basic_Energy_Ball.png');
     game.load.image('ship', 'http://www.pixeljoint.com/files/icons/ship2_transparent_shading2.png');
-    game.load.image('invader', 'http://www.heruraha.net/download/file.php?avatar=22688_1343737809.png');
+    game.load.image('obstacle', 'http://www.heruraha.net/download/file.php?avatar=22688_1343737809.png');
+    game.load.image('bonus', 'https://wiki.cam.ac.uk/wiki/university-map/img_auth.php/4/48/Block.png');
     game.load.spritesheet('kaboom', 'http://fc02.deviantart.net/fs71/f/2013/010/9/f/explosion_spritesheet_for_games_by_gintasdx-d5r28q5.png', 128, 128);
-     game.load.audio('guile', ['assets/audio/guilestheme.mp3']);
+    // game.load.audio('guile', ['assets/audio/deadmau5soma.mp3']);
+    game.load.audio('guile', ['assets/audio/guilestheme2.ogg', 'assets/audio/guilestheme2.mp3']);
+    // game.load.audio('guile', ['assets/audio/bodenstaen.mp3']);
+    game.load.audio('hurt', ['assets/audio/flappyhit.ogg']);
+    // game.load.audio('die', ['assets/audio/flappydie.ogg']);
+    game.stage.disableVisibilityChange = true;
 
 }
-
-  
-
 
 var space;
 var player;
 var obstacles;
+var bonuses
 var cursors;
 var music;
 
 var explosions;
 var score = 0;
+var highScore;
 var scoreString = '';
 var scoreText;
+var level = 1;
+var levelString = '';
+var levelText;
 
 var bullet;
 var bullets;
 var bulletTime = 0;
 var particles;
 var textureRegistry = {};
+var gameOver = false;
+var i = 0;
+var speed = 800  // initial speed
+var time = 200   // initial time in milleseconds to spawn obstacles
+var resetButton;
 
 
 function create() {
@@ -47,8 +59,12 @@ function create() {
 
     // Add music! 
     music = game.add.audio('guile');
-
+    music.loop= true;
     music.play();
+
+    // Add sound!
+    hurtSnd = game.add.audio('hurt');
+
 
     //  We need arcade physics
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -60,6 +76,7 @@ function create() {
     bullets = game.add.group();
     bullets.enableBody = true;
     bullets.physicsBodyType = Phaser.Physics.ARCADE;
+    bullets.setAll('outOfBoundsKill', true);
 
     //  All 40 of them
     bullets.createMultiple(40, 'bullet');
@@ -77,11 +94,20 @@ function create() {
 
     createObstacles();
 
+    // Bonus Obstacle
+    bonuses = game.add.group();
+    bonuses.enableBody = true;
+    bonuses.physicsBodyType = Phaser.Physics.ARCADE;
+
+    createBonus();
+
     //  The score
     scoreString = 'Score : ';
     scoreText = game.add.text(10, 10, scoreString + score, { font: '34px Arial', fill: '#fff' });
 
-    // player.body.set('body.collideWorldBounds', true);
+    //   The Level
+    levelString = 'Level : ';
+    levelText = game.add.text(10, 40, levelString + level, { font: '34px Arial', fill: '#fff' });
 
     //  and its physics settings
     game.physics.enable(player, Phaser.Physics.ARCADE);
@@ -91,83 +117,160 @@ function create() {
 
     //  An explosion pool
     explosions = game.add.group();
-    explosions.createMultiple(50, 'kaboom');
-    explosions.forEach(setupInvader, this);
+    explosions.createMultiple(5, 'kaboom');
+    explosions.forEach(setupObstacle, this);
+    explosions.forEach(setupPlayer, this);
 
 
     //  Game input
     cursors = game.input.keyboard.createCursorKeys();
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ]);
 
+}
 
+    function reset() {
+    // gameStarted = false;
+    gameOver = false;
+    // obstacles = false;
+    music.stop();
+    score = 0;
+    // scoreText = false,
+    level = 1,
+    // levelText = false;
+    bulletTime = 0;
+    i = 0;
+    speed = 800;  // initial speed
+    time = 200; 
+    obstacles.removeAll();
+    game.state.restart();
+
+
+}
+
+// function start() {
+   
+    
+//     // Show score
+//     scoreText.setText(score);
+//     // gameOver = false;
+//     // obstacles = true;
+//     // music = true;
+//     // score = 0;
+//     // scoreText = true,
+//     // level = 1,
+//     // levelText = true;
+//     // bulletTime = 0;
+//     // i = 0;
+//     // speed = 800;  // initial speed
+//     // time = 200; 
+//     // START!
+//     gameStarted = true;
+// }
+
+function shoot() {
+        if (!gameStarted) {
+            start();
+        }
+       
 
     }
 
 function createObstacles () {
-
-    for (var y = 0; y < 4; y++)
-    {
-        for (var x = 0; x < 10; x++)
-        {
-            var obstacle = obstacles.create(x * 48, y * 50, 'invader');
-            obstacle.anchor.setTo(0.5, 0.5);
-            obstacle.animations.add('fly', [ 0, 1, 2, 3 ], 20, true);
-            obstacle.play('fly');
-            obstacle.body.moves = false;
+if (!gameOver) {
+    function difficulty() {
+      setTimeout(function () {
+        if (level%2==0){
+          var obstacle = obstacles.create((Math.floor(Math.random() * 800) + 1),-100, 'bonus');
         }
+        else {
+          var obstacle = obstacles.create((Math.floor(Math.random() * 800) + 1),-100, 'obstacle');
+        };
+        obstacle.anchor.setTo(0.5, 0.5);
+        obstacle.body.velocity.y= speed;
+        i++;
+        if( i % 50 == 0) {
+          if (speed < 6000){
+            speed += 100;      //increase speed of obstacles every 40 obstacles.
+            level += 1;
+            levelText.text = levelString + level;
+          };
+          if (time > 10) {  //decreases spawn time between obstacles.
+            time -= 10;
+          };
+          if (!gameOver) {
+            difficulty();
+          }
+        }
+        else {
+          if(!gameOver) {
+            difficulty();
+          }
+        }
+      }, time)
     }
-
-    obstacles.x = 100;
-    obstacles.y = 50;
-
-    //  All this does is basically start the invaders moving. Notice we're moving the Group they belong to, rather than the invaders directly.
-    var tween = game.add.tween(obstacles).to( { x: 200 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
-
-    //  When the tween loops it calls descend
-    tween.onLoop.add(descend, this);
+  if(!gameOver) {
+  difficulty();
+  }
+  }
 }
 
-function setupInvader (invader) {
-
-    invader.anchor.x = 0.5;
-    invader.anchor.y = 0.5;
-    invader.animations.add('kaboom');
-
+function createBonus () {
+  var x = 0;
+  function repeat() {
+    setTimeout(function () {
+      var bonus = bonuses.create((Math.floor(Math.random() * 700) + 50),-100,'bonus');
+      bonus.anchor.setTo(0.5, 0.5);
+      bonus.body.velocity.y= 400;
+    if(!gameOver) {
+      repeat();
+    }
+    }, 5000)
+  }
+  repeat();
 }
 
-function descend() {
-
-    obstacles.y += 10;
+function setupObstacle (obstacle) {
+    obstacle.anchor.x = 0.4;
+    obstacle.anchor.y = 0.3;
+    obstacle.animations.add('kaboom');
+}
+function setupBonus (bonus) {
+    bonus.anchor.x = 0.4;
+    bonus.anchor.y = 0.3;
+    bonus.animations.add('bonus');
+}
+function setupPlayer (player) {
+    player.anchor.x = 0.4;
+    player.anchor.y = 0.3;
+    player.animations.add('kaboom');
 
 }
 
 function update() {
-        player.body.velocity.setTo(0, 0);
+  if (player.alive) {
+    player.body.velocity.setTo(0, 0);
 
-        if (cursors.left.isDown)
-        {
-            player.body.velocity.x = -400;
-        }
-        else if (cursors.right.isDown)
-        {
-            player.body.velocity.x = 400;
-        }
-        player.body.collideWorldBounds = true;
+    if (cursors.left.isDown) {
+      player.body.velocity.x = -1200;
+    }
+    else if (cursors.right.isDown) {
+      player.body.velocity.x = 1200;
+    }
+      player.body.collideWorldBounds = true;
 
     if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
     {
         fireBullet();
     }
-
-    // screenWrap(player);
-
-    bullets.forEachExists(screenWrap, this);
-    // game.physics.arcade.collide(player, particles);
-    // game.physics.arcade.collide(particles);
+}
+    
     game.physics.arcade.collide(player);
 
     //  Run collision
     game.physics.arcade.overlap(bullets, obstacles, collisionHandler, null, this);
+    game.physics.arcade.overlap(bullets, bonuses, bulletHitsBonus, null, this);
+    game.physics.arcade.overlap(obstacles, player, obstacleHitsPlayer, null, this);
+    game.physics.arcade.overlap(bonuses, player, bonusHitsPlayer, null, this);
     // game.physics.arcade.overlap(enemyBullets, player, enemyHitsPlayer, null, this);
 
 }
@@ -179,7 +282,7 @@ function collisionHandler (bullet, obstacle) {
     obstacle.kill();
 
     //  Increase the score
-    score += 20;
+    score += 10;
     scoreText.text = scoreString + score;
 
     //  And create an explosion :)
@@ -187,23 +290,59 @@ function collisionHandler (bullet, obstacle) {
     explosion.reset(obstacle.body.x, obstacle.body.y);
     explosion.play('kaboom', 50, false, true);
 
-    if (obstacles.countLiving() == 0)
-    {
-        score += 1000;
-        scoreText.text = scoreString + score;
+}
+function bulletHitsBonus (bullet, bonus) {
 
-        // enemyBullets.callAll('kill',this);
-        // stateText.text = " You Won, \n Click to restart";
-        // stateText.visible = true;
+    //  When a bullet hits an bonus we kill them both
+    bullet.kill();
+    bonus.kill();
 
-        //the "click to restart" handler
-        // game.input.onTap.addOnce(restart,this);
+    //  Increase the score
+    score += 1000;
+    scoreText.text = scoreString + score;
+
+    //  And create an explosion :)
+    var explosion = explosions.getFirstExists(false);
+    explosion.reset(bonus.body.x, bonus.body.y);
+    explosion.play('kaboom', 50, false, true);
+
+}
+
+function obstacleHitsPlayer (player, obstacle) {
+    player.kill();
+    obstacle.kill();
+    hurtSnd.play();
+    // setTimeout(function(){dieSnd.play();},600)
+    
+
+    //  And create an explosion :)
+    var explosion = explosions.getFirstExists(false);
+    explosion.reset(player.body.x, player.body.y);
+    explosion.play('kaboom', 50, false, true);
+    setGameOver();
+    if (gameOver=true) {
+      game.input.onTap.addOnce(reset,this);
+    }
+
+}
+function bonusHitsPlayer (player, bonus) {
+    player.kill();
+    bonus.kill();
+    hurtSnd.play();
+    
+    //  And create an explosion :)
+    var explosion = explosions.getFirstExists(false);
+    explosion.reset(player.body.x, player.body.y);
+    explosion.play('kaboom', 50, false, true);
+    setGameOver();
+    if (gameOver=true) {
+      game.input.onTap.addOnce(reset,this);
     }
 
 }
 
 function fireBullet () {
-
+  var coolDown = 100;  // Bullet Cool Down between shots
     if (game.time.now > bulletTime)
     {
         bullet = bullets.getFirstExists(false);
@@ -215,7 +354,12 @@ function fireBullet () {
             // bullet.rotation = player.rotation;
             bullet.body.velocity.y = -500;
             // game.physics.arcade.velocityFromRotation(player.rotation, 400, bullet.body.velocity);
-            bulletTime = game.time.now + 150;
+            if (coolDown >= 40) {
+              if (level % 5 ==0) {
+                coolDown -= 20;
+              }
+            }
+            bulletTime = game.time.now + coolDown;
         }
     }
 
@@ -233,25 +377,14 @@ function createBlock(size, color) {
   return bmd;
 }
 
-function screenWrap (player) {
-
-    if (player.x < 0)
-    {
-        player.x = game.width;
-    }
-    else if (player.x > game.width)
-    {
-        player.x = 0;
-    }
-
-    if (player.y < 0)
-    {
-        player.y = game.height;
-    }
-    else if (player.y > game.height)
-    {
-        player.y = 0;
-    }
+function resetBullet (bullet) {
+    //  Called if the bullet goes out of the screen
+    bullet.kill();
+}
+function setGameOver() {
+  // gameStarted = false;
+  gameOver = true;
+  console.log("This appears");
 
 }
 
