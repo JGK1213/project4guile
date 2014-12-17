@@ -2,9 +2,9 @@ var game = new Phaser.Game(800, 800, Phaser.CANVAS, 'project4-game', { preload: 
 
 function preload() {
 
-    game.load.image('space', 'http://fc03.deviantart.net/fs71/f/2013/269/0/7/peach_tea_animated_cb_6colo_by_missdudette-d6o2o85.gif');
+    game.load.image('space', 'assets/space.jpg');
     game.load.image('bullet', 'http://img2.wikia.nocookie.net/__cb20121009064131/pockiepirate/images/9/99/Basic_Energy_Ball.png');
-    game.load.image('ship', 'http://www.pixeljoint.com/files/icons/ship2_transparent_shading2.png');
+    game.load.image('ship', 'assets/ship.png');
     game.load.image('obstacle', 'http://www.heruraha.net/download/file.php?avatar=22688_1343737809.png');
     game.load.image('bonus', 'https://wiki.cam.ac.uk/wiki/university-map/img_auth.php/4/48/Block.png');
     game.load.spritesheet('kaboom', 'http://fc02.deviantart.net/fs71/f/2013/010/9/f/explosion_spritesheet_for_games_by_gintasdx-d5r28q5.png', 128, 128);
@@ -14,6 +14,8 @@ function preload() {
     game.load.audio('hurt', ['assets/audio/flappyhit.ogg']);
     // game.load.audio('die', ['assets/audio/flappydie.ogg']);
     game.stage.disableVisibilityChange = true;
+    game.load.image('start', 'https://cdn0.iconfinder.com/data/icons/mobile-development-icons/128/Start.png', 270, 180);
+    game.load.image('reset', 'http://www.level0.ch/mt/img/Sync%20Services%20Icon.png', 270, 180);
 
 }
 
@@ -26,9 +28,11 @@ var music;
 
 var explosions;
 var score = 0;
-var highScore;
+var highscore = 0;
 var scoreString = '';
+var highscoreString = '';
 var scoreText;
+var highscoreText;
 var level = 1;
 var levelString = '';
 var levelText;
@@ -40,15 +44,14 @@ var particles;
 var textureRegistry = {};
 var gameOver = false;
 var i = 0;
-var speed = 800  // initial speed
+var speed = 700  // initial speed
 var time = 200   // initial time in milleseconds to spawn obstacles
-var resetButton;
+var gameStarted = false;
 
 
 function create() {
-
     // Display the background
-    space = game.add.tileSprite(0, 0, 800, 800, 'space');
+    space = game.add.tileSprite(0, 0, game.width, game.height, 'space');
     game.physics.enable(space, Phaser.Physics.ARCADE);
     space.autoScroll(0, 400);
     
@@ -62,7 +65,7 @@ function create() {
     music.loop= true;
     music.play();
 
-    // Add sound!
+    // Add a punch sound!
     hurtSnd = game.add.audio('hurt');
 
 
@@ -105,9 +108,14 @@ function create() {
     scoreString = 'Score : ';
     scoreText = game.add.text(10, 10, scoreString + score, { font: '34px Arial', fill: '#fff' });
 
+    //  The High Score
+    highscoreString = 'High Score: ';
+    highscoreText = game.add.text( 10, 70, highscoreString + localStorage.getItem("highscore"), {font: '34px Arial', fill: '#fff'});
+
     //   The Level
     levelString = 'Level : ';
     levelText = game.add.text(10, 40, levelString + level, { font: '34px Arial', fill: '#fff' });
+
 
     //  and its physics settings
     game.physics.enable(player, Phaser.Physics.ARCADE);
@@ -125,61 +133,46 @@ function create() {
     //  Game input
     cursors = game.input.keyboard.createCursorKeys();
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ]);
+    if(!gameStarted) {
+      game.paused = true;
+      menu = game.add.sprite(400, 400, 'start');
+      menu.anchor.setTo(0.5, 0.5);
+    }
+    game.input.onTap.addOnce(unpause, self);
+    function unpause(event){
+      if(game.paused){
+        game.paused = false;
+        menu.destroy();
+        createObstacles();
+        // createsBonus();
+      }
+    };
 
+  
 }
 
-    function reset() {
-    // gameStarted = false;
+function reset() {
+    restartGame.destroy();
+    gameStarted = true;
     gameOver = false;
     // obstacles = false;
-    music.stop();
     score = 0;
     // scoreText = false,
     level = 1,
     // levelText = false;
     bulletTime = 0;
     i = 0;
-    speed = 800;  // initial speed
+    speed = 700;  // initial speed
     time = 200; 
     obstacles.removeAll();
     game.state.restart();
 
-
 }
 
-// function start() {
-   
-    
-//     // Show score
-//     scoreText.setText(score);
-//     // gameOver = false;
-//     // obstacles = true;
-//     // music = true;
-//     // score = 0;
-//     // scoreText = true,
-//     // level = 1,
-//     // levelText = true;
-//     // bulletTime = 0;
-//     // i = 0;
-//     // speed = 800;  // initial speed
-//     // time = 200; 
-//     // START!
-//     gameStarted = true;
-// }
-
-function shoot() {
-        if (!gameStarted) {
-            start();
-        }
-       
-
-    }
-
 function createObstacles () {
-if (!gameOver) {
     function difficulty() {
       setTimeout(function () {
-        if (level%2==0){
+        if(level%2==0){
           var obstacle = obstacles.create((Math.floor(Math.random() * 800) + 1),-100, 'bonus');
         }
         else {
@@ -188,6 +181,7 @@ if (!gameOver) {
         obstacle.anchor.setTo(0.5, 0.5);
         obstacle.body.velocity.y= speed;
         i++;
+        if(!game.paused){
         if( i % 50 == 0) {
           if (speed < 6000){
             speed += 100;      //increase speed of obstacles every 40 obstacles.
@@ -197,36 +191,50 @@ if (!gameOver) {
           if (time > 10) {  //decreases spawn time between obstacles.
             time -= 10;
           };
-          if (!gameOver) {
-            difficulty();
-          }
+            if (!gameOver) {
+              difficulty();
+            }
         }
         else {
-          if(!gameOver) {
-            difficulty();
-          }
+            if(!gameOver) {
+              console.log("PLEASE WORK");
+              difficulty();
+            }
+        }
         }
       }, time)
     }
-  if(!gameOver) {
-  difficulty();
-  }
-  }
+    if(!gameOver) {
+      difficulty();
+    }
 }
 
+
+
 function createBonus () {
-  var x = 0;
-  function repeat() {
-    setTimeout(function () {
-      var bonus = bonuses.create((Math.floor(Math.random() * 700) + 50),-100,'bonus');
-      bonus.anchor.setTo(0.5, 0.5);
-      bonus.body.velocity.y= 400;
-    if(!gameOver) {
-      repeat();
+    console.log("this should be working")
+    function repeat() {
+      setTimeout(function () {
+        var bonus = bonuses.create((Math.floor(Math.random() * 700) + 50),-20,'bonus');
+        bonus.anchor.setTo(0.5, 0.5);
+        bonus.body.velocity.y= 400;
+        if(!game.paused){
+        console.log("testing")
+        if(!gameOver) {
+          repeat();
+        }
+        else {
+          bonus.kill();
+        }
+      }
+      }, 4000)
     }
-    }, 5000)
+  if(!gameOver) {
+    repeat();
   }
-  repeat();
+  else {
+    bonus.kill();
+  }
 }
 
 function setupObstacle (obstacle) {
@@ -298,7 +306,7 @@ function bulletHitsBonus (bullet, bonus) {
     bonus.kill();
 
     //  Increase the score
-    score += 1000;
+    score += 200;
     scoreText.text = scoreString + score;
 
     //  And create an explosion :)
@@ -320,7 +328,13 @@ function obstacleHitsPlayer (player, obstacle) {
     explosion.reset(player.body.x, player.body.y);
     explosion.play('kaboom', 50, false, true);
     setGameOver();
+    if (score > localStorage.getItem("highscore")) {
+                localStorage.setItem("highscore", score);
+
+    }
     if (gameOver=true) {
+      restartGame= game.add.sprite(400, 400, 'reset');
+      restartGame.anchor.setTo(0.5, 0.5);
       game.input.onTap.addOnce(reset,this);
     }
 
@@ -335,7 +349,12 @@ function bonusHitsPlayer (player, bonus) {
     explosion.reset(player.body.x, player.body.y);
     explosion.play('kaboom', 50, false, true);
     setGameOver();
+    if (score > localStorage.getItem("highscore")) {
+                localStorage.setItem("highscore", score);
+    }
     if (gameOver=true) {
+      restartGame= game.add.sprite(400, 400, 'reset');
+      restartGame.anchor.setTo(0.5, 0.5);
       game.input.onTap.addOnce(reset,this);
     }
 
@@ -364,18 +383,18 @@ function fireBullet () {
     }
 
 }
-function createBlock(size, color) {
-  var name = size + '_' + color;
-  if(textureRegistry[name]) {
-    return textureRegistry[name];
-  }
+// function createBlock(size, color) {
+//   var name = size + '_' + color;
+//   if(textureRegistry[name]) {
+//     return textureRegistry[name];
+//   }
   
-  var bmd = game.add.bitmapData(size, size);
-  bmd.ctx.fillStyle = color;
-  bmd.ctx.fillRect(0,0, size, size);
-  textureRegistry[name] = bmd;
-  return bmd;
-}
+//   var bmd = game.add.bitmapData(size, size);
+//   bmd.ctx.fillStyle = color;
+//   bmd.ctx.fillRect(0,0, size, size);
+//   textureRegistry[name] = bmd;
+//   return bmd;
+// }
 
 function resetBullet (bullet) {
     //  Called if the bullet goes out of the screen
@@ -384,9 +403,11 @@ function resetBullet (bullet) {
 function setGameOver() {
   // gameStarted = false;
   gameOver = true;
+  music.stop();
   console.log("This appears");
 
 }
 
-function render() {
+function render(){
+
 }
