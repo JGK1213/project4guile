@@ -217,7 +217,7 @@ function createBonus () {
       setTimeout(function () {
         var bonus = bonuses.create((Math.floor(Math.random() * 700) + 50),-20,'bonus');
         bonus.anchor.setTo(0.5, 0.5);
-        bonus.body.velocity.y= 400;
+        bonus.body.velocity.y= 500;
         if(!game.paused){
         console.log("testing")
         if(!gameOver) {
