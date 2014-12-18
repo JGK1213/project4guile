@@ -360,7 +360,7 @@ function bonusHitsPlayer (player, bonus) {
                 localStorage.setItem("highscore", score);
     }
     if (gameOver=true) {
-      restartGame= game.add.sprite(400, 400, 'reset');
+      restartGame= game.add.sprite(300, 300, 'reset');
       restartGame.anchor.setTo(0.5, 0.5);
       game.input.onTap.addOnce(reset,this);
     }
