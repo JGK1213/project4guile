@@ -4,7 +4,6 @@ angular.module('myApp', [])
 
 		helper.sayHi;
 
-		$scope.user = {name: 'Alfredo', sex: 'male'};
 }])
 
 .service('helper', function() {
