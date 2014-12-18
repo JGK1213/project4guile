@@ -23,7 +23,7 @@ function preload() {
 var space;
 var player;
 var obstacles;
-var bonuses
+var bonuses;
 var cursors;
 var music;
 
@@ -45,9 +45,11 @@ var particles;
 var textureRegistry = {};
 var gameOver = false;
 var i = 0;
-var speed = 600  // initial speed
-var time = 200   // initial time in milleseconds to spawn obstacles
+var speed = 600;  // initial speed
+var time = 200;   // initial time in milleseconds to spawn obstacles
 var gameStarted = false;
+var resetCounter = 0;
+var bonusCounter = 0;
 
 
 function create() {
@@ -98,14 +100,20 @@ function create() {
     obstacles.enableBody = true;
     obstacles.physicsBodyType = Phaser.Physics.ARCADE;
 
-    createObstacles();
+    if(resetCounter >= 1) {
+      createObstacles();
+    }
+
 
     // Bonus Obstacle
     bonuses = game.add.group();
     bonuses.enableBody = true;
     bonuses.physicsBodyType = Phaser.Physics.ARCADE;
 
-    createBonus();
+    if(resetCounter >= 1) {
+      createBonus();
+    }
+    
 
     //  The score
     scoreString = 'Score : ';
@@ -144,10 +152,12 @@ function create() {
     game.input.onTap.addOnce(unpause, self);
     function unpause(event){
       if(game.paused){
-        game.paused = false;
-        menu.destroy();
-        createObstacles();
-        // createsBonus();
+        if (!gameOver) {
+          game.paused = false;
+          menu.destroy();
+          createObstacles();
+          createBonus();
+        }
       }
     };
 
@@ -194,31 +204,26 @@ function createObstacles () {
     }
 }
 
-
-// Creates the Bonus Item
-function createBonus () {
-    function repeat() {
-      setTimeout(function () {
-        var bonus = bonuses.create((Math.floor(Math.random() * 500) + 50),-20,'bonus');
-        bonus.anchor.setTo(0.5, 0.5);
-        bonus.body.velocity.y= 400;
-        if(!game.paused){
-          if(!gameOver) {
-            repeat();
-          }
-          else {
-            bonus.kill();
-          }
-        }
-      }, 4000)
+function createBonus() {
+  function repeat(){
+    if(level%2==0){
+      console.log("created bonus")
+      var bonus = bonuses.create((Math.floor(Math.random() * 500) + 50), -200,'bonus');
+      bonus.anchor.setTo(0.5, 0.5);
+      bonus.body.velocity.y= 350;
+      bonusCounter++;
     }
-  if(!gameOver) {
-    repeat();           //Initiates the function.
   }
-  else {
-    bonus.kill();
+  if(level%2!=0) {
+    bonusCounter = 0;
+  }
+  if(!gameOver){
+    if(bonusCounter == 0) {
+      repeat();
+    }
   }
 }
+
 
 function setupObstacle (obstacle) {
     obstacle.anchor.x = 0.4;
@@ -253,16 +258,20 @@ function update() {
         fireBullet();
     }
   }
+
+  if(!gameOver){
+    createBonus();
+  }
+
     
-    game.physics.arcade.collide(player);
+  game.physics.arcade.collide(player);
 
-    //  Run collision
-    game.physics.arcade.overlap(bullets, obstacles, bulletHitsObstacle, null, this);
-    game.physics.arcade.overlap(bullets, bonuses, bulletHitsBonus, null, this);
-    game.physics.arcade.overlap(obstacles, player, obstacleHitsPlayer, null, this);
-    game.physics.arcade.overlap(bonuses, player, bonusHitsPlayer, null, this);
-    // game.physics.arcade.overlap(enemyBullets, player, enemyHitsPlayer, null, this);
-
+  //  Run collision
+  game.physics.arcade.overlap(bullets, obstacles, bulletHitsObstacle, null, this);
+  game.physics.arcade.overlap(bullets, bonuses, bulletHitsBonus, null, this);
+  game.physics.arcade.overlap(obstacles, player, obstacleHitsPlayer, null, this);
+  game.physics.arcade.overlap(bonuses, player, bonusHitsPlayer, null, this);
+  // game.physics.arcade.overlap(enemyBullets, player, enemyHitsPlayer, null, this);
 }
 
 function fireBullet () {
@@ -297,7 +306,6 @@ function bulletHitsObstacle (bullet, obstacle) {
     //  Increase the score
     if(!gameOver) {
       score += 10;
-      console.log("Just scored 10")
       scoreText.text = scoreString + score;
     }
 
@@ -315,8 +323,7 @@ function bulletHitsBonus (bullet, bonus) {
 
     //  Increase the score
     if(!gameOver){
-      score += 200;
-      console.log("Just scored 200")
+      score += 500;
       scoreText.text = scoreString + score;
     }
     //  And create an explosion :)
@@ -341,7 +348,7 @@ function obstacleHitsPlayer (player, obstacle) {
     if (score > localStorage.getItem("highscore")) {
                 localStorage.setItem("highscore", score);
     }
-    if (gameOver=true) {
+    if (gameOver==true) {
       restartGame= game.add.sprite(300, 300, 'reset');
       restartGame.anchor.setTo(0.5, 0.5);
       game.input.onTap.addOnce(reset,this);
@@ -361,8 +368,8 @@ function bonusHitsPlayer (player, bonus) {
     if (score > localStorage.getItem("highscore")) {
                 localStorage.setItem("highscore", score);
     }
-    if (gameOver=true) {
-      restartGame= game.add.sprite(300, 300, 'reset');
+    if (gameOver==true) {
+      restartGame = game.add.sprite(300, 300, 'reset');
       restartGame.anchor.setTo(0.5, 0.5);
       game.input.onTap.addOnce(reset,this);
     }
@@ -384,16 +391,15 @@ function reset() {
     restartGame.destroy();
     gameStarted = true;
     gameOver = false;
-    // obstacles = false;
     score = 0;
-    // scoreText = false,
     level = 1,
-    // levelText = false;
     bulletTime = 0;
     i = 0;
     speed = 600;  // initial speed
     time = 250; 
+    resetCounter++;
     obstacles.removeAll();
+    bonuses.removeAll();
     game.state.restart();
 }
 
