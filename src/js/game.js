@@ -274,7 +274,7 @@ function fireBullet () {
         if (bullet)
         {
             bullet.reset(player.body.x + 16, player.body.y + 16);
-            bullet.lifespan = 1400;
+            bullet.lifespan = 1050;
             // bullet.rotation = player.rotation;
             bullet.body.velocity.y = -500;
             // game.physics.arcade.velocityFromRotation(player.rotation, 400, bullet.body.velocity);
