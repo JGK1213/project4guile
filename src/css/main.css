@@ -6,8 +6,19 @@ html, body {
 }
 
 .game {
-  width: 640px;
-  height: 480px;
-  margin: auto;
-  margin-left: 460px;
+  width: 600px;
+  height: 600px;
+  margin: 0 auto;
+  /*margin-left: 460px;*/
+}
+
+
+#howtoplay {
+  text-align: center;
+  background-color:gray;
+  width: 300px;
+  height: 300px;
+  float: left;
+  color: white;
+  margin: 0 auto;
 }
