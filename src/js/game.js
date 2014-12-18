@@ -6,6 +6,7 @@ function preload() {
     game.load.image('bullet', 'assets/images/bullet.png');
     game.load.spritesheet('ship', 'assets/images/ship.png', 72, 72);
     game.load.image('obstacle', 'assets/images/obstacle.png');
+    game.load.image('obstacle2', 'assets/images/obstacle2.png');
     game.load.image('bonus', 'assets/images/bonus.png');
     game.load.spritesheet('kaboom', 'assets/images/kaboom.png', 96, 96);
     // game.load.audio('guile', ['assets/audio/deadmau5soma.mp3']);
