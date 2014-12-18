@@ -4,7 +4,7 @@ function preload() {
 
     game.load.image('space', 'assets/images/space.jpg');
     game.load.image('bullet', 'assets/images/bullet.png');
-    game.load.spritesheet('ship', 'assets/images/ship.png', 72, 72);
+    game.load.spritesheet('ship', 'assets/images/ship_sprite.png', 72, 72);
     game.load.image('obstacle', 'assets/images/obstacle.png');
     game.load.image('obstacle2', 'assets/images/obstacle2.png');
     game.load.image('bonus', 'assets/images/bonus.png');
@@ -90,6 +90,8 @@ function create() {
     //  Our player ship
     player = game.add.sprite(300, 560, 'ship');
     player.anchor.set(0.5);
+    player.animations.add('ship');
+    player.animations.play('ship', 24, true);
 
     // Obstacles
     obstacles = game.add.group();
@@ -360,7 +362,7 @@ function bonusHitsPlayer (player, bonus) {
                 localStorage.setItem("highscore", score);
     }
     if (gameOver=true) {
-      restartGame= game.add.sprite(400, 400, 'reset');
+      restartGame= game.add.sprite(300, 300, 'reset');
       restartGame.anchor.setTo(0.5, 0.5);
       game.input.onTap.addOnce(reset,this);
     }
