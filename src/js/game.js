@@ -10,7 +10,7 @@ function preload() {
     game.load.image('bonus', 'assets/images/bonus.png');
     game.load.spritesheet('kaboom', 'assets/images/kaboom.png', 96, 96);
     // game.load.audio('guile', ['assets/audio/deadmau5soma.mp3']);
-    game.load.audio('guile', ['assets/audio/guilestheme2.ogg', 'assets/audio/guilestheme2.mp3']);
+    game.load.audio('guile', ['assets/audio/UseThisGuile1.ogg']);
     // game.load.audio('guile', ['assets/audio/bodenstaen.mp3']);
     game.load.audio('hurt', ['assets/audio/flappyhit.ogg']);
     // game.load.audio('die', ['assets/audio/flappydie.ogg']);
@@ -45,7 +45,7 @@ var particles;
 var textureRegistry = {};
 var gameOver = false;
 var i = 0;
-var speed = 700  // initial speed
+var speed = 600  // initial speed
 var time = 200   // initial time in milleseconds to spawn obstacles
 var gameStarted = false;
 
@@ -54,7 +54,7 @@ function create() {
     // Display the background
     space = game.add.tileSprite(0, 0, game.width, game.height, 'space');
     game.physics.enable(space, Phaser.Physics.ARCADE);
-    space.autoScroll(0, 400);
+    space.autoScroll(0, 300);
     
 
     //  This will run in Canvas mode, so let's gain a little speed and display
@@ -88,7 +88,7 @@ function create() {
     bullets.setAll('anchor.y', 0.2);
 
     //  Our player ship
-    player = game.add.sprite(400, 750, 'ship');
+    player = game.add.sprite(300, 560, 'ship');
     player.anchor.set(0.5);
 
     // Obstacles
@@ -107,15 +107,15 @@ function create() {
 
     //  The score
     scoreString = 'Score : ';
-    scoreText = game.add.text(10, 10, scoreString + score, { font: '34px Arial', fill: '#fff' });
+    scoreText = game.add.text(10, 10, scoreString + score, { font: '20px Arial', fill: '#fff' });
 
     //  The High Score
     highscoreString = 'High Score: ';
-    highscoreText = game.add.text( 10, 70, highscoreString + localStorage.getItem("highscore"), {font: '34px Arial', fill: '#fff'});
+    highscoreText = game.add.text( 10, 70, highscoreString + localStorage.getItem("highscore"), {font: '20px Arial', fill: '#fff'});
 
     //   The Level
     levelString = 'Level : ';
-    levelText = game.add.text(10, 40, levelString + level, { font: '34px Arial', fill: '#fff' });
+    levelText = game.add.text(10, 40, levelString + level, { font: '20px Arial', fill: '#fff' });
 
 
     //  and its physics settings
@@ -136,7 +136,7 @@ function create() {
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ]);
     if(!gameStarted) {
       game.paused = true;
-      menu = game.add.sprite(400, 400, 'start');
+      menu = game.add.sprite(300, 300, 'start');
       menu.anchor.setTo(0.5, 0.5);
     }
     game.input.onTap.addOnce(unpause, self);
@@ -157,10 +157,10 @@ function createObstacles () {
     function difficulty() {
       setTimeout(function () {
         if(level%2==0){
-          var obstacle = obstacles.create((Math.floor(Math.random() * 800) + 1),-100, 'obstacle2');
+          var obstacle = obstacles.create((Math.floor(Math.random() * 600) + 1),-100, 'obstacle2');
         }
         else {
-          var obstacle = obstacles.create((Math.floor(Math.random() * 800) + 1),-100, 'obstacle');
+          var obstacle = obstacles.create((Math.floor(Math.random() * 600) + 1),-100, 'obstacle');
         };
         obstacle.anchor.setTo(0.5, 0.5);
         obstacle.body.velocity.y= speed;
@@ -197,9 +197,9 @@ function createObstacles () {
 function createBonus () {
     function repeat() {
       setTimeout(function () {
-        var bonus = bonuses.create((Math.floor(Math.random() * 700) + 50),-20,'bonus');
+        var bonus = bonuses.create((Math.floor(Math.random() * 500) + 50),-20,'bonus');
         bonus.anchor.setTo(0.5, 0.5);
-        bonus.body.velocity.y= 500;
+        bonus.body.velocity.y= 400;
         if(!game.paused){
           if(!gameOver) {
             repeat();
@@ -340,7 +340,7 @@ function obstacleHitsPlayer (player, obstacle) {
                 localStorage.setItem("highscore", score);
     }
     if (gameOver=true) {
-      restartGame= game.add.sprite(400, 400, 'reset');
+      restartGame= game.add.sprite(300, 300, 'reset');
       restartGame.anchor.setTo(0.5, 0.5);
       game.input.onTap.addOnce(reset,this);
     }
@@ -389,8 +389,8 @@ function reset() {
     // levelText = false;
     bulletTime = 0;
     i = 0;
-    speed = 700;  // initial speed
-    time = 200; 
+    speed = 600;  // initial speed
+    time = 250; 
     obstacles.removeAll();
     game.state.restart();
 }
