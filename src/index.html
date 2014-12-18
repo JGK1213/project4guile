@@ -5,29 +5,35 @@
 
 	<!-- build:css main.min.css -->
   <link rel="stylesheet" href="css/main.css"> 
+  <link href='http://fonts.googleapis.com/css?family=Chewy' rel='stylesheet' type='text/css'>
 </head>
 
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js"></script>
+
+
 
 <body ng-app="myApp" ng-controller="myController">
 <div>VIEW</div>
 <div id="howtoplay">
   <h1>HOW TO PLAY!</h1>
   <div class="leftAlign">
-    <ul>
-      <li>Use Left and Right Arrow Keys to Move</li>
-      <li>Hold Down Space Bar to Shoot</li>
-      <li>10 Points for Each Object</li>
-      <li>200 Points for the Slower-Moving Gems</li>
-      <li>Beat Your High Score!</li>
-    </ul>
+    <h4>
+      <ul>
+        <li>Use Left and Right Arrow Keys to Move</li>
+        <li>Hold Down Space Bar to Shoot</li>
+        <li>10 Points for Each Object</li>
+        <li>200 Points for the Slower-Moving Gems</li>
+        <li>Regular Objects Increase in Speed Each Level</li>
+        <li>Staying still and holding down space bar won't get you very far!</li>
+        <li>Good Luck, and Try to Beat Your High Score!</li>
+      </ul>
+    </h4>
   </div>
 </div>
 <div id="project4-game" class="game"></div>
 
 
 <script src="./bower_components/phaser/build/phaser.min.js"></script>
-
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js"></script>
 <script src="js/main.js"></script>
 <script src="js/game.js"></script>
 
