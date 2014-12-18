@@ -279,7 +279,7 @@ function fireBullet () {
             bullet.body.velocity.y = -500;
             // game.physics.arcade.velocityFromRotation(player.rotation, 400, bullet.body.velocity);
             if (coolDown >= 40) {
-              if (level % 5 ==0) {
+              if (level % 3 ==0) {
                 coolDown -= 20;
               }
             }
