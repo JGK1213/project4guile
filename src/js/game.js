@@ -132,6 +132,10 @@ function create() {
     explosions.forEach(setupObstacle, this);
     explosions.forEach(setupPlayer, this);
 
+    // Add music! 
+    music = game.add.audio('guile');
+    music.loop= true;
+    music.play();
 
     //  Game input
     cursors = game.input.keyboard.createCursorKeys();
@@ -152,10 +156,6 @@ function create() {
         }
       }
     };
-    // Add music! 
-    music = game.add.audio('guile');
-    music.loop= true;
-    music.play();
 
   
 }
