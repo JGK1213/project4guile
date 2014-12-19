@@ -114,15 +114,15 @@ function create() {
 
     //  The score
     scoreString = 'Score : ';
-    scoreText = game.add.text(10, 40, scoreString + score, { font: '20px Arial', fill: '#fff' });
+    scoreText = game.add.text(10, 5, scoreString + score, { font: '20px Arial', fill: '#fff' });
 
     //  The High Score
     highscoreString = 'High Score: ';
-    highscoreText = game.add.text( 10, 10, highscoreString + localStorage.getItem("highscore"), {font: '20px Arial', fill: '#fff'});
+    highscoreText = game.add.text( 415, 5, highscoreString + localStorage.getItem("highscore"), {font: '20px Arial', fill: '#fff'});
 
     //   The Level
     levelString = 'Level : ';
-    levelText = game.add.text(10, 70, levelString + level, { font: '20px Arial', fill: '#fff' });
+    levelText = game.add.text(10, 30, levelString + level, { font: '20px Arial', fill: '#fff' });
 
 
     //  and its physics settings
