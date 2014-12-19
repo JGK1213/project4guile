@@ -2,8 +2,17 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #000;
+  background-image: url(../assets/images/background.png);
+  background-size: cover;
   font-family: 'Chewy', cursive;
+}
+
+#logo {
+  width: 275px;
+  height: 150px;
+  float: left;
+  margin: 150px 25px;
+  position: absolute;
 }
 
 .game {
