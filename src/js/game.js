@@ -402,3 +402,13 @@ function reset() {
 function render(){
 
 }
+
+
+//karma TDD
+
+describe("hello", function () {
+  it("should work", function () {
+    expect(true).toBe(false)
+  })
+})
+
