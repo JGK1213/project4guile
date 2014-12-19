@@ -60,11 +60,6 @@ function create() {
     game.renderer.clearBeforeRender = false;
     game.renderer.roundPixels = true;
 
-    // Add music! 
-    music = game.add.audio('guile');
-    music.loop= true;
-    music.play();
-
     // Add a punch sound!
     hurtSnd = game.add.audio('hurt');
 
@@ -157,6 +152,10 @@ function create() {
         }
       }
     };
+    // Add music! 
+    music = game.add.audio('guile');
+    music.loop= true;
+    music.play();
 
   
 }
