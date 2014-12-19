@@ -9,8 +9,8 @@ function preload() {
     game.load.image('obstacle2', 'assets/images/obstacle2.png');
     game.load.image('bonus', 'assets/images/bonus.png');
     game.load.spritesheet('kaboom', 'assets/images/kaboom.png', 96, 96);
-    game.load.audio('guile', ['assets/audio/UseThisGuile1.ogg', 'assets/audio/UseThisGuile1.mp3']);
-    game.load.audio('hurt', ['assets/audio/flappyhit.ogg', 'assets/audio/flappyhit.mp3']);
+    game.load.audio('guile', ['assets/audio/UseThisGuile1.ogg']);
+    game.load.audio('hurt', ['assets/audio/flappyhit.ogg']);
     game.stage.disableVisibilityChange = true;
     game.load.image('start', 'assets/images/start.png', 270, 180);
     game.load.image('reset', 'assets/images/playagain.png', 270, 180);
