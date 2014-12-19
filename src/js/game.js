@@ -47,6 +47,8 @@ var time = 200;   // initial time in milleseconds to spawn obstacles
 var gameStarted = false;
 var resetCounter = 0;
 var bonusCounter = 0;
+var m = 0;
+
 
 
 function create() {
@@ -132,11 +134,6 @@ function create() {
     explosions.forEach(setupObstacle, this);
     explosions.forEach(setupPlayer, this);
 
-    // Add music! 
-    music = game.add.audio('guile');
-    music.loop= true;
-    music.play();
-
     //  Game input
     cursors = game.input.keyboard.createCursorKeys();
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ]);
@@ -153,6 +150,7 @@ function create() {
           menu.destroy();
           createObstacles();
           createBonus();
+          m++;
         }
       }
     };
@@ -257,6 +255,14 @@ function update() {
 
   if(!gameOver){
     createBonus();
+  }
+
+  // Add music!
+  if(m == 1){ 
+    music = game.add.audio('guile');
+    music.loop= true;
+    music.play();
+    m++;
   }
 
     
@@ -394,6 +400,7 @@ function reset() {
     speed = 600;  // initial speed
     time = 250; 
     resetCounter++;
+    m = 1;
     obstacles.removeAll();
     bonuses.removeAll();
     game.state.restart();
