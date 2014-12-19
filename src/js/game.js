@@ -15,8 +15,8 @@ function preload() {
     game.load.audio('hurt', ['assets/audio/flappyhit.ogg']);
     // game.load.audio('die', ['assets/audio/flappydie.ogg']);
     game.stage.disableVisibilityChange = true;
-    game.load.image('start', 'https://cdn0.iconfinder.com/data/icons/mobile-development-icons/128/Start.png', 270, 180);
-    game.load.image('reset', 'http://www.level0.ch/mt/img/Sync%20Services%20Icon.png', 270, 180);
+    game.load.image('start', 'assets/images/start.png', 270, 180);
+    game.load.image('reset', 'assets/images/playagain.png', 270, 180);
 
 }
 
