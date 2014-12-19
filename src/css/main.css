@@ -25,12 +25,12 @@ html, body {
   /*background-color: rgba(160, 160, 160, 0.4);*/
   /*background-color:gray;*/
   width: 340px;
-  height: 350px;
+  height: 400px;
   color: white;
   float: right;
   top: 0;
   bottom: 0;
-  right: 10px;
+  right: 5px;
   margin: auto;
   position: absolute;
 }
@@ -40,14 +40,27 @@ html, body {
 }
 
 #hideshow {
-  opacity: 0.3;
   float: right;
-  top: 70%;
-  right: 10%;
+  top: 68%;
+  right: 8%;
   bottom: 0;
   margin: auto;
   position: relative;
 }
-#hideshow:hover {
+#btn {
+  opacity: 0.3;
+  -webkit-border-radius: 8;
+  -moz-border-radius: 8;
+  border-radius: 8px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 12px;
+  background: #425059;
+  padding: 6px 12px 6px 12px;
+  text-decoration: none;
+}
+#btn:hover {
+  background: #425059;
+  text-decoration: none;
   opacity: 1.0;
 }
