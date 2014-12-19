@@ -9,11 +9,8 @@ function preload() {
     game.load.image('obstacle2', 'assets/images/obstacle2.png');
     game.load.image('bonus', 'assets/images/bonus.png');
     game.load.spritesheet('kaboom', 'assets/images/kaboom.png', 96, 96);
-    // game.load.audio('guile', ['assets/audio/deadmau5soma.mp3']);
-    game.load.audio('guile', ['assets/audio/UseThisGuile1.ogg']);
-    // game.load.audio('guile', ['assets/audio/bodenstaen.mp3']);
-    game.load.audio('hurt', ['assets/audio/flappyhit.ogg']);
-    // game.load.audio('die', ['assets/audio/flappydie.ogg']);
+    game.load.audio('guile', ['assets/audio/UseThisGuile1.ogg', 'assets/audio/UseThisGuile1.mp3']);
+    game.load.audio('hurt', ['assets/audio/flappyhit.ogg', 'assets/audio/flappyhit.mp3']);
     game.stage.disableVisibilityChange = true;
     game.load.image('start', 'https://cdn0.iconfinder.com/data/icons/mobile-development-icons/128/Start.png', 270, 180);
     game.load.image('reset', 'http://www.level0.ch/mt/img/Sync%20Services%20Icon.png', 270, 180);
@@ -117,15 +114,15 @@ function create() {
 
     //  The score
     scoreString = 'Score : ';
-    scoreText = game.add.text(10, 10, scoreString + score, { font: '20px Arial', fill: '#fff' });
+    scoreText = game.add.text(10, 40, scoreString + score, { font: '20px Arial', fill: '#fff' });
 
     //  The High Score
     highscoreString = 'High Score: ';
-    highscoreText = game.add.text( 10, 70, highscoreString + localStorage.getItem("highscore"), {font: '20px Arial', fill: '#fff'});
+    highscoreText = game.add.text( 10, 10, highscoreString + localStorage.getItem("highscore"), {font: '20px Arial', fill: '#fff'});
 
     //   The Level
     levelString = 'Level : ';
-    levelText = game.add.text(10, 40, levelString + level, { font: '20px Arial', fill: '#fff' });
+    levelText = game.add.text(10, 70, levelString + level, { font: '20px Arial', fill: '#fff' });
 
 
     //  and its physics settings
