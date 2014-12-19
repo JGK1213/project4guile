@@ -15,6 +15,7 @@ function preload() {
     game.load.image('start', 'assets/images/start.png', 270, 180);
     game.load.image('reset', 'assets/images/playagain.png', 270, 180);
 
+
 }
 
 var space;
@@ -265,7 +266,6 @@ function update() {
     m++;
   }
 
-    
   game.physics.arcade.collide(player);
 
   //  Run collision
