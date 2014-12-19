@@ -30,8 +30,19 @@
     </h4>
   </div>
 </div>
+<div id="hideshow">
+  <button>Hide/Show Instructions</button>
+</div>
 <div id="project4-game" class="game"></div>
 
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $("#hideshow").on('click', function() {
+      $("#howtoplay").fadeToggle(1000);
+    })
+  });
+</script>
 
 <script src="./bower_components/phaser/build/phaser.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js"></script>
