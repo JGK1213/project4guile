@@ -43,7 +43,7 @@ var particles;
 var textureRegistry = {};
 var gameOver = false;
 var i = 0;
-var speed = 600;  // initial speed
+var speed = 350;  // initial speed
 var time = 200;   // initial time in milleseconds to spawn obstacles
 var gameStarted = false;
 var resetCounter = 0;
@@ -397,7 +397,7 @@ function reset() {
     level = 1,
     bulletTime = 0;
     i = 0;
-    speed = 600;  // initial speed
+    speed = 350;  // initial speed
     time = 250; 
     resetCounter++;
     m = 1;
