@@ -175,7 +175,7 @@ function createObstacles () {
         if(!game.paused){
         if( i % 50 == 0) {
           if (speed < 6000){
-            speed += 100;      //increase speed of obstacles every 40 obstacles.
+            speed += 100;      //increase speed of obstacles every 50 obstacles.
             level += 1;
             levelText.text = levelString + level;
           };
@@ -242,10 +242,10 @@ function update() {
     player.body.velocity.setTo(0, 0);
 
     if (cursors.left.isDown) {
-      player.body.velocity.x = -1200;
+      player.body.velocity.x = -500;
     }
     else if (cursors.right.isDown) {
-      player.body.velocity.x = 1200;
+      player.body.velocity.x = 500;
     }
       player.body.collideWorldBounds = true;
 
